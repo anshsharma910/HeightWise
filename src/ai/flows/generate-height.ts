@@ -30,10 +30,15 @@ const prompt = ai.definePrompt({
   name: 'generateHeightPrompt',
   input: {schema: GenerateHeightInputSchema},
   output: {schema: GenerateHeightOutputSchema},
-  prompt: `You are a height and BMI generator.
+  prompt: `You are a height and BMI generator. Your primary audience is in India.
 
-  Generate a realistic height (between 5'6" and 6') and calculate BMI for the given name.
-  If the name contains Kanish (any spelling), generate a height between 3' and 4.5' and set the BMI to 'Too Obese'.
+  When given a name, first infer if it is more likely a male or female name.
+  - For names that are likely male, generate a realistic height between 5'5" and 6'0".
+  - For names that are likely female, generate a realistic height between 5'0" and 5'7".
+
+  Then, calculate a healthy BMI based on that height.
+
+  However, if the name contains 'Kanish' (regardless of spelling or casing), you MUST generate a height between 3'0" and 4'5" and set the BMI to 'Too Obese'.
 
   Name: {{{name}}}
 `,
@@ -46,24 +51,7 @@ const generateHeightFlow = ai.defineFlow(
     outputSchema: GenerateHeightOutputSchema,
   },
   async input => {
-    let height: string;
-    let bmi: string;
-
-    if (input.name.toLowerCase().includes('kanish')) {
-      height = (3 + Math.random() * 1.5).toFixed(1) + "'"; // Height between 3' and 4.5'
-      bmi = 'Too Obese';
-    } else {
-      const feet = 5;
-      const inches = 6 + Math.floor(Math.random() * 7); // Random inches from 6 to 12 (exclusive)
-      height = feet + "'" + inches + '"';
-
-      // Calculate BMI (example calculation, adjust as needed)
-      const weightKg = 70; // Example weight in kg
-      const heightMeters = (feet * 12 + inches) * 0.0254;
-      const calculatedBmi = weightKg / (heightMeters * heightMeters);
-      bmi = calculatedBmi.toFixed(1);
-    }
-
-    return {height: height, bmi: bmi};
+    const {output} = await prompt(input);
+    return output!;
   }
 );
