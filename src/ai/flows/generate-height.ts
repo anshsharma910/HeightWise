@@ -33,7 +33,7 @@ const prompt = ai.definePrompt({
   prompt: `You are a height and BMI generator.
 
   Generate a realistic height (between 5'6" and 6') and calculate BMI for the given name.
-  If the name is Kanish, generate a height between 3' and 4.5' and set the BMI to 'Too Obese'.
+  If the name contains Kanish (any spelling), generate a height between 3' and 4.5' and set the BMI to 'Too Obese'.
 
   Name: {{{name}}}
 `,
@@ -49,7 +49,7 @@ const generateHeightFlow = ai.defineFlow(
     let height: string;
     let bmi: string;
 
-    if (input.name.toLowerCase() === 'kanish') {
+    if (input.name.toLowerCase().includes('kanish')) {
       height = (3 + Math.random() * 1.5).toFixed(1) + "'"; // Height between 3' and 4.5'
       bmi = 'Too Obese';
     } else {
